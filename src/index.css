@@ -1,0 +1,372 @@
+@import 'tailwindcss';
+
+@theme {
+  /* 参考图配色：深灰黑底 + 温暖淡米黄强调 + 浅灰米色文字 */
+  --color-ink-950: #292a30;
+  --color-ink-900: #25262c;
+  --color-ink-850: #2f3036;
+  --color-ink-800: #35363c;
+  --color-ink-750: #3c3d43;
+  --color-ink-700: #45464c;
+  --color-ink-600: #5b5c62;
+
+  --color-mist-50: #f2f0e8;
+  --color-mist-100: #d4d1c5;
+  --color-mist-200: #c4c1b7;
+  --color-mist-300: #aaa8a1;
+  --color-mist-400: #8f8e8a;
+  --color-mist-500: #777873;
+
+  /* 清单页主强调色：#F8D77C 淡米黄色 */
+  --color-brand-300: #fbe8a9;
+  --color-brand-400: #f8d77c;
+  --color-brand-500: #f8d77c;
+  --color-brand-600: #d8b95f;
+
+  /* 完成状态统一使用主米黄色，避免出现突兀的绿色 */
+  --color-mint-400: #f8d77c;
+  --color-mint-500: #d8b95f;
+
+  --color-rose-400: #c98578;
+
+  /* 计划书的纸：对齐参考截图里的米白 #ece9e0 */
+  --color-paper: #ece9e0;
+  --color-paper-ink: #2b2723;
+  --color-paper-soft: #8a8375;
+  --color-paper-line: #f8d77c;
+  --color-paper-check: #d9b45c;
+  --color-paper-shade: #cfccbf;
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Segoe UI', Roboto, sans-serif;
+
+  --radius-card: 12px;
+
+  /* 统一的缓动曲线：起手快、收尾稳，是「丝滑」的关键 */
+  --ease-out-soft: cubic-bezier(0.22, 0.72, 0.24, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  #root {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-ink-950);
+    color: var(--color-mist-100);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: 16px; /* 防止 iOS 聚焦时页面缩放 */
+  }
+
+  /* 只过渡会走合成器的属性，避免整页重绘导致切换卡顿 */
+  button,
+  [role='button'] {
+    transition:
+      transform 0.16s var(--ease-out-soft),
+      background-color 0.16s var(--ease-out-soft),
+      border-color 0.16s var(--ease-out-soft),
+      color 0.16s var(--ease-out-soft),
+      opacity 0.16s var(--ease-out-soft);
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  /* 按下时轻微回弹，给所有可点元素一致的触感 */
+  .press:active {
+    transform: scale(0.97);
+  }
+  .press-sm:active {
+    transform: scale(0.94);
+  }
+  .field-reset {
+    appearance: none;
+    background: none;
+    border: 0;
+    outline: none;
+  }
+}
+
+/* ================================ 动效基元 ================================ */
+
+/* 拖拽中的源元素占位 */
+.dnd-dragging {
+  opacity: 0.35;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-page {
+  animation: page-in 0.24s var(--ease-out-soft) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade {
+  animation: fade-in 0.2s ease-out both;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(18px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.animate-sheet {
+  animation: sheet-up 0.26s var(--ease-out-soft) both;
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(0.8);
+  }
+  58% {
+    transform: scale(1.14);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-check {
+  animation: check-pop 0.28s var(--ease-out-soft);
+}
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-row {
+  animation: row-in 0.2s var(--ease-out-soft) both;
+}
+
+/* ============================== 底部导航指示器 ============================== */
+
+.nav-indicator {
+  transition: transform 0.34s var(--ease-spring);
+  will-change: transform;
+}
+
+/* ============================== 计划书（翻页） ============================== */
+
+.book-stage {
+  perspective: 2200px;
+  perspective-origin: 50% 42%;
+  /* 翻页由脚本接管手势，避免浏览器把横向滑动判成页面滚动 */
+  touch-action: none;
+}
+
+.book {
+  position: relative;
+  transform-style: preserve-3d;
+  /* 轻微俯视：像坐在桌前看一本摊开的手帐，而不是一块贴屏的平板 */
+  transform: rotateX(6deg);
+}
+
+/* 纸叠最下面一层的收口：一整沓纸的底口 */
+.book-under {
+  position: absolute;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #e6e3d8 0%, #d6d3c6 60%, #c8c5b8 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 1px 2px rgba(60, 50, 32, 0.12);
+}
+
+.book-sheet {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+}
+
+/* 手指跟随中的纸页：提升为合成层，避免逐帧重绘 */
+.book-sheet--live {
+  will-change: transform;
+}
+
+.book-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* 卡片：上沿一道高光、四周一道极淡的压边，底下挤出几道纸口 —— 一张压出来的厚卡 */
+.book-card {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.78) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.42) inset,
+    0 -1px 0 rgba(120, 104, 72, 0.16) inset,
+    0 0 0 1px rgba(126, 110, 76, 0.14),
+    0 1.5px 0 -0.5px #dbd6c7,
+    0 3px 0 -1.5px #d1ccbc,
+    0 4.5px 0 -2.5px #c7c2b2,
+    0 7px 11px -6px rgba(56, 46, 26, 0.38);
+}
+
+/* 纸的切口：卡片厚度的那个面 */
+.book-slab {
+  position: absolute;
+  pointer-events: none;
+  background-color: #ded9ca;
+  background-image: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.62),
+    rgba(150, 132, 96, 0.16)
+  );
+}
+
+.book-slab--h {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.62),
+    rgba(150, 132, 96, 0.16)
+  );
+}
+
+.book-face--back {
+  transform: rotateY(180deg);
+}
+
+/* 纸面：做旧的米色纸 + 纤维纹路 */
+/* 纸面：米白纸 + 纤维纹路 + 极淡的横格线（手帐本内页） */
+.book-paper {
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(120% 85% at 50% -10%, rgba(255, 253, 246, 0.7), rgba(255, 253, 246, 0) 58%),
+    radial-gradient(95% 75% at 50% 112%, rgba(126, 104, 68, 0.16), rgba(126, 104, 68, 0) 62%),
+    repeating-linear-gradient(97deg, rgba(138, 118, 84, 0.05) 0 1px, rgba(138, 118, 84, 0) 1px 4px),
+    repeating-linear-gradient(6deg, rgba(138, 118, 84, 0.04) 0 1px, rgba(138, 118, 84, 0) 1px 5px);
+}
+
+/* 内页横格：只铺在内容区，不影响卡片边缘 */
+.page-lines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(120, 104, 72, 0.11) 0 1px,
+    rgba(120, 104, 72, 0) 1px 26px
+  );
+}
+
+/* 书脊阴影：右页压左边缘，左页压右边缘 */
+.book-spine-right {
+  background: linear-gradient(
+    to right,
+    rgba(76, 62, 40, 0.3),
+    rgba(76, 62, 40, 0.1) 18%,
+    rgba(76, 62, 40, 0) 42%
+  );
+}
+
+.book-spine-left {
+  background: linear-gradient(
+    to left,
+    rgba(76, 62, 40, 0.3),
+    rgba(76, 62, 40, 0.1) 18%,
+    rgba(76, 62, 40, 0) 42%
+  );
+}
+
+/* 书口：已由 .book-slab（卡片切口）接管，这里不再需要页边堆叠 */
+
+.book-btn {
+  display: grid;
+  place-items: center;
+  height: 40px;
+  width: 40px;
+  border-radius: 9999px;
+  border: 1px solid rgba(248, 215, 124, 0.28);
+  background-color: var(--color-ink-850);
+  color: var(--color-brand-400);
+}
+
+.book-btn:disabled {
+  opacity: 0.28;
+}
+
+.book-btn:not(:disabled):active {
+  transform: scale(0.94);
+  background-color: var(--color-ink-750);
+}
+
+/* ============================== 无障碍：减弱动效 ============================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .nav-indicator {
+    transition: none;
+  }
+}

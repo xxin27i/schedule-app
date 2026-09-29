@@ -1,0 +1,27 @@
+# 依赖
+node_modules/
+
+# 构建缓存
+.vite/
+*.tsbuildinfo
+
+# 日志与系统文件
+*.log
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.idea/
+.vscode/
+*.swp
+
+# 环境变量（本项目当前不需要，防止以后误提交）
+.env
+.env.*
+!.env.example
+
+# 本地打的部署包；dist/ 本身保留在仓库里，方便随时拖到 Netlify 重新部署
+*.zip
+
+# 做 UI 时参考用的实拍图（本地素材，不进仓库；public/ 下的内容会被打包发布，注意别放私密素材）
+public/ref/
